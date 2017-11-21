@@ -22,6 +22,7 @@ export default class Authen extends Component {
     this.login = this.login.bind(this);
     this.signup = this.signup.bind(this);
     this.logout = this.logout.bind(this);
+    this.google = this.google.bind(this);
   }
   login(event){
     //get email and password
@@ -94,6 +95,26 @@ export default class Authen extends Component {
     document.getElementById('input_container').classList.remove('hide');
     this.setState({info:''});
   } //end logout
+
+  google(event){
+    console.log("Sign In with google");
+    var provider = new firebase.auth.GoogleAuthProvider();
+    //var promise = firebase.auth().signInWithPopup(provider);
+    var promise = firebase.auth().signInWithRedirect(provider);
+    promise
+    .then(result=>{
+        var user = result.user;
+        console.log(user);
+        firebase.database().ref('users/'+user.uid).set({
+            email:user.email,
+            name:user.displayName
+        });
+    })
+    .catch(e=>{
+        var msg = e.message;
+        console.log(msg);
+    });
+  }//end google
   
   render() {
     return (
@@ -107,6 +128,7 @@ export default class Authen extends Component {
         <button onClick={this.login} id="login">Log In</button>
         <button onClick={this.signup} id="signup">Sign Up</button>
         <button onClick={this.logout} id="logout" className="hide">Log Out</button>
+        <button onClick={this.google} id="google" className="google">Sign In with Google</button>
       </div>
     )
   }
